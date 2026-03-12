@@ -1,1 +1,0 @@
-﻿src/elasticsearch.ts(82,67): error TS2339: Property 'sort' does not exist on type 'SearchRequest | SearchRequest | undefined'.
