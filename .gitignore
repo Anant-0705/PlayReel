@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Build outputs
+dist/
+build/
+**/dist/
+**/build/
+
+# TypeScript compiled
+**/*.js.map
+**/tsconfig.tsbuildinfo
+
+# Logs
+*.log
+logs/
+**/logs/
+
+# Docker volumes (local dev data)
+.docker-volumes/
+postgres-data/
+redis-data/
+minio-data/
+rabbitmq-data/
+elasticsearch-data/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test coverage
+coverage/
+**/coverage/
+
+# Temporary
+tmp/
+temp/
+**/tmp/
+
+# Jenkins
+.jenkins/
+
+# MinIO uploads (local)
+uploads/

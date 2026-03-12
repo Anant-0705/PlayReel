@@ -1,0 +1,11 @@
+﻿src/algorithm.ts(1,23): error TS2307: Cannot find module '../db' or its corresponding type declarations.
+src/algorithm.ts(44,52): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/algorithm.ts(51,41): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/algorithm.ts(58,35): error TS7006: Parameter 'r' implicitly has an 'any' type.
+src/algorithm.ts(61,44): error TS7006: Parameter '_' implicitly has an 'any' type.
+src/algorithm.ts(61,47): error TS7006: Parameter 'i' implicitly has an 'any' type.
+src/algorithm.ts(79,50): error TS7006: Parameter 'g' implicitly has an 'any' type.
+src/algorithm.ts(80,50): error TS7006: Parameter 'g' implicitly has an 'any' type.
+src/algorithm.ts(82,36): error TS7006: Parameter 'g' implicitly has an 'any' type.
+src/algorithm.ts(101,18): error TS7006: Parameter 'a' implicitly has an 'any' type.
+src/algorithm.ts(101,21): error TS7006: Parameter 'b' implicitly has an 'any' type.
