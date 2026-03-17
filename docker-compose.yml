@@ -372,9 +372,8 @@ services:
       - mq_net
     environment:
       <<: [*env-defaults, *db-env, *rabbit-env]
-      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-}
-      FIREBASE_PRIVATE_KEY: ${FIREBASE_PRIVATE_KEY:-}
-      FIREBASE_CLIENT_EMAIL: ${FIREBASE_CLIENT_EMAIL:-}
+      # Full Firebase service account JSON (stringified)
+      FIREBASE_SERVICE_ACCOUNT_JSON: ${FIREBASE_SERVICE_ACCOUNT_JSON:-}
     volumes:
       - ./workers/notification-worker/src:/app/src:ro
     depends_on:
