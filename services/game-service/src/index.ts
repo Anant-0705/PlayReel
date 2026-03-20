@@ -1,6 +1,5 @@
 import express from 'express';
 import helmet from 'helmet';
-import cors from 'cors';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import { errorHandler } from '../../../shared/errors';
@@ -13,8 +12,8 @@ import searchRoutes from './routes/search';
 const app = express();
 const PORT = Number(process.env.PORT) || 3002;
 
+app.set('trust proxy', 1);
 app.use(helmet());
-app.use(cors({ origin: true, credentials: true }));
 app.use(morgan('combined'));
 app.use(express.json({ limit: '1mb' }));
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 200, standardHeaders: true, legacyHeaders: false }));

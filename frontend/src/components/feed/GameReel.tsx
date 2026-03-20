@@ -5,7 +5,8 @@ import { CommentSheet } from './CommentSheet';
 import axios from 'axios';
 import { useAuthStore } from '../../store/authStore';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:80';
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:80').replace(/\/+$/, '');
+const API_ROOT = API_BASE.endsWith('/api') ? API_BASE : `${API_BASE}/api`;
 
 export function GameReel() {
   const { games, nextCursor, isLoading, hasMore, appendGames, setLoading } = useFeedStore();
@@ -32,7 +33,7 @@ export function GameReel() {
     try {
       const endpoint = cursor ? `/feed?cursor=${cursor}` : '/feed';
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      const res = await axios.get(`${API_URL}${endpoint}`, { headers });
+      const res = await axios.get(`${API_ROOT}${endpoint}`, { headers });
       
       const newGames = res.data.data.games;
       const newCursor = res.data.data.nextCursor;

@@ -79,7 +79,7 @@ export async function searchGames(params: {
         from,
         size,
         query: { bool: { must: must.length ? must : [{ match_all: {} }], filter } },
-        sort: sortConfig as Parameters<typeof esClient.search>[0]['sort'],
+        sort: sortConfig as any,
     });
 
     const hits = response.hits.hits.map((h) => h._source as GameDocument);

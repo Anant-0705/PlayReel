@@ -39,14 +39,26 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
     setFile(selectedFile);
   };
 
+  const normalizeGenre = (value: string) => {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'arcade') return 'other';
+    return normalized;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file || !title || !description || !genre) {
       setErrorLocal('Please fill out all fields and select a file.');
       return;
     }
+
+    const normalizedGenre = normalizeGenre(genre);
+    if (!normalizedGenre) {
+      setErrorLocal('Please select a valid genre.');
+      return;
+    }
     
-    const success = await startUpload(file, { title, description, genre });
+    const success = await startUpload(file, { title, description, genre: normalizedGenre });
     if (success) {
       onSuccess();
     }
@@ -110,11 +122,16 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
                className="w-full bg-[#0d1425] border border-white/10 rounded-xl px-5 py-3.5 text-white font-medium focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none shadow-inner"
              >
                <option value="" disabled>Select a genre</option>
-               <option value="Action">Action</option>
-               <option value="Puzzle">Puzzle</option>
-               <option value="RPG">RPG</option>
-               <option value="Arcade">Arcade</option>
-               <option value="Platformer">Platformer</option>
+               <option value="action">Action</option>
+               <option value="puzzle">Puzzle</option>
+               <option value="platformer">Platformer</option>
+               <option value="rpg">RPG</option>
+               <option value="shooter">Shooter</option>
+               <option value="strategy">Strategy</option>
+               <option value="sports">Sports</option>
+               <option value="horror">Horror</option>
+               <option value="simulation">Simulation</option>
+               <option value="other">Other</option>
              </select>
              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-5 text-gray-400">
                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/></svg>

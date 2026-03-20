@@ -205,6 +205,7 @@ services:
       JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-30d}
     volumes:
       - ./services/user-service/src:/app/src:ro
+      - ./shared:/shared:ro
     ports:
       - "3001:3001"
     depends_on:
@@ -229,8 +230,10 @@ services:
     environment:
       <<: [*env-defaults, *db-env, *minio-env, *elastic-env]
       PORT: 3002
+      JWT_SECRET: ${JWT_SECRET:-changeme_jwt_secret_minimum_32_characters}
     volumes:
       - ./services/game-service/src:/app/src:ro
+      - ./shared:/shared:ro
     ports:
       - "3002:3002"
     depends_on:
@@ -257,8 +260,10 @@ services:
     environment:
       <<: [*env-defaults, *db-env, *redis-env, *rabbit-env]
       PORT: 3003
+      JWT_SECRET: ${JWT_SECRET:-changeme_jwt_secret_minimum_32_characters}
     volumes:
       - ./services/feed-service/src:/app/src:ro
+      - ./shared:/shared:ro
     ports:
       - "3003:3003"
     depends_on:
@@ -285,8 +290,10 @@ services:
     environment:
       <<: [*env-defaults, *db-env, *redis-env, *rabbit-env]
       PORT: 3004
+      JWT_SECRET: ${JWT_SECRET:-changeme_jwt_secret_minimum_32_characters}
     volumes:
       - ./services/social-service/src:/app/src:ro
+      - ./shared:/shared:ro
     ports:
       - "3004:3004"
     depends_on:
@@ -313,12 +320,14 @@ services:
     environment:
       <<: [*env-defaults, *db-env, *rabbit-env, *minio-env]
       PORT: 3005
+      JWT_SECRET: ${JWT_SECRET:-changeme_jwt_secret_minimum_32_characters}
       UPLOAD_MAX_SIZE_BYTES: ${UPLOAD_MAX_SIZE_BYTES:-209715200}
       UPLOAD_CHUNK_SIZE_BYTES: ${UPLOAD_CHUNK_SIZE_BYTES:-5242880}
       UPLOAD_MAX_PER_DAY: ${UPLOAD_MAX_PER_DAY:-10}
       UPLOAD_MAX_CONCURRENT: ${UPLOAD_MAX_CONCURRENT:-5}
     volumes:
       - ./services/upload-service/src:/app/src:ro
+      - ./shared:/shared:ro
     ports:
       - "3005:3005"
     depends_on:
@@ -351,6 +360,7 @@ services:
       <<: [*env-defaults, *db-env, *rabbit-env, *minio-env, *elastic-env]
     volumes:
       - ./workers/game-processor/src:/app/src:ro
+      - ./shared:/shared:ro
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -376,6 +386,7 @@ services:
       FIREBASE_SERVICE_ACCOUNT_JSON: ${FIREBASE_SERVICE_ACCOUNT_JSON:-}
     volumes:
       - ./workers/notification-worker/src:/app/src:ro
+      - ./shared:/shared:ro
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -389,19 +400,18 @@ services:
   frontend:
     build:
       context: ./frontend
-      target: development
+      args:
+        VITE_API_URL: http://localhost:80/api
+        VITE_WS_URL: ws://localhost:80/api
     container_name: gamereel-frontend
     networks:
       - public_net
       - internal_net
     environment:
-      VITE_API_URL: http://localhost:80
-      VITE_WS_URL: ws://localhost:80
-    volumes:
-      - ./frontend/src:/app/src:ro
-      - ./frontend/public:/app/public:ro
+      VITE_API_URL: http://localhost:80/api
+      VITE_WS_URL: ws://localhost:80/api
     ports:
-      - "5173:5173"
+      - "5173:80"
 
   # ──────────────────────────────────────────────────────────
   # API Gateway

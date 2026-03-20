@@ -1,6 +1,5 @@
 import express from 'express';
 import helmet from 'helmet';
-import cors from 'cors';
 import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import { errorHandler } from '../../../shared/errors';
@@ -12,8 +11,8 @@ import uploadRoutes from './routes/upload';
 const app = express();
 const PORT = Number(process.env.PORT) || 3005;
 
+app.set('trust proxy', 1);
 app.use(helmet());
-app.use(cors({ origin: true, credentials: true }));
 app.use(morgan('combined'));
 // Note: chunk upload uses raw binary — body parsing is handle per-route
 app.use(express.json({ limit: '1mb' }));

@@ -17,7 +17,8 @@ interface CommentSheetProps {
   onClose: () => void;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:80';
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:80').replace(/\/+$/, '');
+const API_ROOT = API_BASE.endsWith('/api') ? API_BASE : `${API_BASE}/api`;
 
 export function CommentSheet({ gameId, isOpen, onClose }: CommentSheetProps) {
   const [comments, setComments] = useState<Comment[]>([]);
@@ -32,7 +33,7 @@ export function CommentSheet({ gameId, isOpen, onClose }: CommentSheetProps) {
   const fetchComments = async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${API_URL}/comments/${gameId}`);
+      const res = await axios.get(`${API_ROOT}/social/comments/${gameId}`);
       if (res.data?.data?.comments) {
           setComments(res.data.data.comments);
       }
@@ -47,7 +48,7 @@ export function CommentSheet({ gameId, isOpen, onClose }: CommentSheetProps) {
     e.preventDefault();
     if (!newComment.trim() || !token) return;
     try {
-      await axios.post(`${API_URL}/comments/${gameId}`, { content: newComment }, {
+      await axios.post(`${API_ROOT}/social/comment`, { gameId, content: newComment }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setNewComment('');

@@ -3,7 +3,8 @@ import { useUploadStore } from '../store/uploadStore';
 import { useAuthStore } from '../store/authStore';
 
 const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks (must match backend MAX_CHUNK_SIZE)
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:80';
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:80').replace(/\/+$/, '');
+const API_ROOT = API_BASE.endsWith('/api') ? API_BASE : `${API_BASE}/api`;
 
 export function useChunkedUpload() {
   const uploadStore = useUploadStore();
@@ -20,7 +21,7 @@ export function useChunkedUpload() {
     
     try {
       // 1. Init upload session
-      const { data: initRes } = await axios.post(`${API_URL}/upload/init`, {
+      const { data: initRes } = await axios.post(`${API_ROOT}/upload/init`, {
         filename: file.name,
         fileSize: file.size,
         totalChunks,
@@ -44,16 +45,16 @@ export function useChunkedUpload() {
         const end = Math.min(start + CHUNK_SIZE, file.size);
         const chunk = file.slice(start, end);
         
-        const formData = new FormData();
-        formData.append('sessionId', sessionId);
-        formData.append('chunkIndex', chunkIndex.toString());
-        formData.append('chunk', chunk);
-        
-        await axios.post(`${API_URL}/upload/chunk`, formData, {
-          headers: { 
+        const chunkBuffer = await chunk.arrayBuffer();
+
+        await axios.put(`${API_ROOT}/upload/chunk`, chunkBuffer, {
+          headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          }
+            'Content-Type': 'application/octet-stream',
+            'X-Session-ID': sessionId,
+            'X-Chunk-Index': chunkIndex.toString(),
+            'X-Total-Chunks': totalChunks.toString(),
+          },
         });
         
         uploadedBytes += chunk.size;

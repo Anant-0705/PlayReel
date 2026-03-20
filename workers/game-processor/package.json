@@ -16,7 +16,9 @@
     "minio": "^8.0.0",
     "pg": "^8.11.5",
     "puppeteer-core": "^22.6.0",
-    "sharp": "^0.33.3",
+    "sharp": "^0.33.3"
+  },
+  "overrides": {
     "zlib": "^1.0.5"
   },
   "devDependencies": {

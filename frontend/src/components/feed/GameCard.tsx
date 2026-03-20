@@ -11,7 +11,8 @@ interface GameCardProps {
   onShareClick: () => void;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:80';
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:80').replace(/\/+$/, '');
+const API_ROOT = API_BASE.endsWith('/api') ? API_BASE : `${API_BASE}/api`;
 
 export function GameCard({ game, onCommentClick, onShareClick }: GameCardProps) {
   // 60% intersection threshold. When mostly visible, we boot the game.
@@ -40,9 +41,9 @@ export function GameCard({ game, onCommentClick, onShareClick }: GameCardProps) 
     
     try {
       if (intent) {
-        await axios.post(`${API_URL}/likes/${game.id}`, {}, { headers: { Authorization: `Bearer ${token}` }});
+        await axios.post(`${API_ROOT}/social/like/${game.id}`, {}, { headers: { Authorization: `Bearer ${token}` }});
       } else {
-        await axios.delete(`${API_URL}/likes/${game.id}`, { headers: { Authorization: `Bearer ${token}` }});
+        await axios.delete(`${API_ROOT}/social/unlike/${game.id}`, { headers: { Authorization: `Bearer ${token}` }});
       }
     } catch (err) {
       setLocalLiked(!intent); // Revert on failure

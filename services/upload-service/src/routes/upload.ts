@@ -33,6 +33,13 @@ const uploadRateLimit = rateLimit({
 });
 
 // ── Schemas ───────────────────────────────────────────────────
+const normalizeGenre = (value: unknown) => {
+    if (typeof value !== 'string') return value;
+    const normalized = value.trim().toLowerCase();
+    if (normalized === 'arcade') return 'other';
+    return normalized;
+};
+
 const InitSchema = z.object({
     filename: z.string().min(1),
     fileSize: z.number().int().positive().max(MAX_UPLOAD_SIZE),
@@ -40,7 +47,10 @@ const InitSchema = z.object({
     metadata: z.object({
         title: z.string().min(1).max(100),
         description: z.string().max(500).default(''),
-        genre: z.enum(['action', 'puzzle', 'platformer', 'rpg', 'shooter', 'strategy', 'sports', 'horror', 'simulation', 'other']),
+        genre: z.preprocess(
+            normalizeGenre,
+            z.enum(['action', 'puzzle', 'platformer', 'rpg', 'shooter', 'strategy', 'sports', 'horror', 'simulation', 'other']),
+        ),
         playstoreUrl: z.string().url().optional(),
     }),
 });

@@ -5,7 +5,8 @@ import { useAuthStore } from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
 import { Gamepad2, Mail, Lock, User as UserIcon } from 'lucide-react';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:80';
+const API_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:80').replace(/\/+$/, '');
+const API_ROOT = API_BASE.endsWith('/api') ? API_BASE : `${API_BASE}/api`;
 
 export function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
@@ -22,12 +23,12 @@ export function AuthPage() {
     setError('');
     try {
       if (isLogin) {
-        const res = await axios.post(`${API_URL}/auth/login`, { email, password });
-        login(res.data.data.token, res.data.data.user);
+        const res = await axios.post(`${API_ROOT}/auth/login`, { email, password });
+        login(res.data.data.accessToken, res.data.data.user);
         navigate('/');
       } else {
-        const res = await axios.post(`${API_URL}/auth/register`, { email, password, username });
-        login(res.data.data.token, res.data.data.user);
+        const res = await axios.post(`${API_ROOT}/auth/register`, { email, password, username });
+        login(res.data.data.accessToken, res.data.data.user);
         navigate('/');
       }
     } catch (err: any) {

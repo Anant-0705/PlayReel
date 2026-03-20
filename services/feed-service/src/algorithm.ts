@@ -1,5 +1,5 @@
-import { query } from '../db';
-import { FEED_SCORE_WEIGHTS, FEED_PAGE_SIZE } from '../../../shared/constants';
+import { query } from './db';
+import { FEED_SCORE_WEIGHTS, FEED_PAGE_SIZE } from '../../../../shared/constants';
 
 export interface ScoredGame {
     id: string;

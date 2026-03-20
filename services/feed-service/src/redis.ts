@@ -1,5 +1,5 @@
 import Redis from 'ioredis';
-import { FEED_CACHE_TTL } from '../../../shared/constants';
+import { FEED_CACHE_TTL } from '../../../../shared/constants';
 
 let redis: Redis | null = null;
 

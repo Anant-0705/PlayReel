@@ -1,7 +1,7 @@
 # ── Stage 1: base ──────────────────────────────────────────────
 FROM node:20-slim AS base
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    chromium \
     fonts-liberation \
     libatk-bridge2.0-0 \
     libatk1.0-0 \
@@ -14,9 +14,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxdamage1 \
     libxrandr2 \
     xdg-utils \
+    ca-certificates \
+    curl \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
+
+RUN curl -Lo chromium.zip https://storage.googleapis.com/chromium-browser-snapshots/Linux_x64/1095492/chrome-linux.zip \
+    && unzip chromium.zip -d /opt/ \
+    && rm chromium.zip \
+    && ln -s /opt/chrome-linux/chrome /usr/bin/chromium
+
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
 WORKDIR /app
 
 # ── Stage 2: deps ───────────────────────────────────────────────
@@ -27,14 +37,14 @@ RUN npm ci --omit=dev
 # ── Stage 3: dev ────────────────────────────────────────────────
 FROM base AS development
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 COPY . .
 CMD ["npx", "ts-node", "-r", "tsconfig-paths/register", "src/index.ts"]
 
 # ── Stage 4: builder ────────────────────────────────────────────
 FROM base AS builder
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 COPY . .
 RUN npx tsc
 
