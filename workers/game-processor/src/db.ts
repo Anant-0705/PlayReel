@@ -1,4 +1,4 @@
-import { Pool, QueryResult } from 'pg';
+import { Pool, QueryResult, QueryResultRow } from 'pg';
 
 const pool = new Pool({
     host: process.env.DB_HOST || 'postgres',
@@ -11,12 +11,12 @@ const pool = new Pool({
     connectionTimeoutMillis: 5_000,
 });
 
-export async function query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
+export async function query<T extends QueryResultRow>(sql: string, params: unknown[] = []): Promise<T[]> {
     const result: QueryResult<T> = await pool.query(sql, params);
     return result.rows;
 }
 
-export async function queryOne<T>(sql: string, params: unknown[] = []): Promise<T | undefined> {
+export async function queryOne<T extends QueryResultRow>(sql: string, params: unknown[] = []): Promise<T | undefined> {
     const rows = await query<T>(sql, params);
     return rows[0];
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import type { Game } from '../../store/feedStore';
 import { useIntersection } from '../../hooks/useIntersection';
 import { SocialBar } from './SocialBar';
@@ -20,14 +20,34 @@ export function GameCard({ game, onCommentClick, onShareClick }: GameCardProps) 
   const token = useAuthStore(state => state.token);
   const [localLiked, setLocalLiked] = useState(!!game.isLikedByMe);
   const [playStarted, setPlayStarted] = useState(false);
+  const [gameUrl, setGameUrl] = useState<string | null>(null);
+  const [interacting, setInteracting] = useState(false);
+
+  // Fetch the manifest.json to get the real indexUrl (entry point varies per ZIP structure)
+  useEffect(() => {
+    if (!game.manifest_url) return;
+    let cancelled = false;
+    axios.get(game.manifest_url).then((res) => {
+      if (!cancelled && res.data?.indexUrl) {
+        // Fix any old localhost:9000 references in the manifest
+        const url = (res.data.indexUrl as string).replace('http://localhost:9000', 'http://localhost');
+        setGameUrl(url);
+      }
+    }).catch(() => {
+      // Fallback: try the naive approach
+      if (!cancelled) {
+        setGameUrl(game.manifest_url!.replace('manifest.json', 'index.html'));
+      }
+    });
+    return () => { cancelled = true; };
+  }, [game.manifest_url]);
 
   useEffect(() => {
     if (isIntersecting) {
       setPlayStarted(true);
     } else {
-      // Memory Management: DESTROY iframe when game scrolls off-screen.
-      // Using the web worker, the next boot will be instant from disk cache.
-      setPlayStarted(false); 
+      setPlayStarted(false);
+      setInteracting(false); // Reset overlay when scrolled away
     }
   }, [isIntersecting]);
 
@@ -50,17 +70,37 @@ export function GameCard({ game, onCommentClick, onShareClick }: GameCardProps) 
     }
   };
 
+  const handleOverlayClick = useCallback(() => {
+    setInteracting(true);
+  }, []);
+
   return (
     <div ref={ref} className="w-full h-full snap-start relative bg-[#0a0f1c] flex items-center justify-center overflow-hidden border-b border-white/5">
       
       {/* Game Rendering Layer */}
-      {playStarted ? (
-        <iframe 
-          src={game.manifest_url ? game.manifest_url.replace('manifest.json', 'index.html') : ''} 
-          className="w-full h-full border-none z-0"
-          sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-forms"
-          title={game.title}
-        />
+      {playStarted && gameUrl ? (
+        <>
+          <iframe 
+            src={gameUrl} 
+            className="w-full h-full border-none z-0"
+            sandbox="allow-scripts allow-same-origin allow-pointer-lock allow-forms"
+            title={game.title}
+          />
+          {/* Scroll-capture overlay: allows parent scroll, tap to interact with game */}
+          {!interacting && (
+            <div 
+              onClick={handleOverlayClick}
+              className="absolute inset-0 z-[1] cursor-pointer"
+              style={{ touchAction: 'pan-y' }}
+            >
+              <div className="absolute bottom-[45%] left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 pointer-events-none animate-pulse">
+                <div className="px-4 py-2 bg-black/60 backdrop-blur-sm rounded-full border border-white/20 text-white/90 text-sm font-medium shadow-lg">
+                  Tap to play · Scroll for next
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       ) : (
         <div className="w-full h-full relative">
           <img src={game.thumbnail_url} alt={game.title} className="w-full h-full object-cover opacity-30 saturate-50 blur-sm scale-110" />

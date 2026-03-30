@@ -43,7 +43,7 @@ x-minio-env: &minio-env
   MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-gamereel_access}
   MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-changeme_minio_secret}
   MINIO_BUCKET: ${MINIO_BUCKET:-game-assets}
-  MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:-http://localhost:9000}
+  MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:-http://localhost}
 
 x-elastic-env: &elastic-env
   ELASTICSEARCH_HOST: ${ELASTICSEARCH_HOST:-elasticsearch}

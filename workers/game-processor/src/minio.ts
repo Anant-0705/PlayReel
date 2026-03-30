@@ -51,7 +51,7 @@ export async function deleteFile(key: string): Promise<void> {
 
 /** Generate a public URL (no auth) for the given key */
 export function publicUrl(key: string): string {
-    const host = process.env.MINIO_PUBLIC_HOST || `http://minio:9000`;
+    const host = process.env.MINIO_PUBLIC_URL || process.env.MINIO_PUBLIC_HOST || 'http://localhost:9000';
     return `${host}/${BUCKET}/${key}`;
 }
 

@@ -3,7 +3,9 @@ import { brotliCompress, constants as zlibConstants } from 'zlib';
 
 const brotliCompressAsync = promisify(brotliCompress);
 
-const COMPRESSIBLE_EXTENSIONS = ['.wasm', '.js', '.css', '.html'];
+// DISABLED: Brotli pre-compression causes garbled output over HTTP (browsers only
+// decompress Brotli over HTTPS). Re-enable when deploying behind HTTPS/CDN.
+const COMPRESSIBLE_EXTENSIONS: string[] = [];
 
 export interface CompressResult {
     originalSize: number;

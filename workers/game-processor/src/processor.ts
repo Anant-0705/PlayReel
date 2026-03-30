@@ -26,7 +26,8 @@ export async function processGame(msg: ConsumeMessage): Promise<void> {
     const filesToUpload = new Map<string, Buffer>(); // key → buffer
     let entryPointPath: string = MINIO_PATHS.gameIndex(gameId);
     let wasmKey: string | null = null;
-    let detectedFormat = format;
+    type ProcessingFormat = 'zip' | 'wasm' | 'raw-wasm' | 'unity-webgl' | 'godot-html5' | 'html5';
+    let detectedFormat: ProcessingFormat = format;
 
     if (format === 'wasm') {
         // ── 2a. Raw WASM path ─────────────────────────────────────────────
@@ -50,7 +51,7 @@ export async function processGame(msg: ConsumeMessage): Promise<void> {
             throw new Error('ZIP has no index.html and no detectable game format');
         }
 
-        detectedFormat = detection.format;
+        detectedFormat = detection.format as ProcessingFormat;
         entryPointPath = `games/${gameId}/${detection.entryPoint}`;
 
         // Extract all ZIP entries into the files map
@@ -74,9 +75,6 @@ export async function processGame(msg: ConsumeMessage): Promise<void> {
             const ext = path.extname(key).toLowerCase();
             const contentType = contentTypeFor(ext);
             const metadata: Record<string, string> = {};
-            if (['.wasm', '.js'].includes(ext)) {
-                metadata['Content-Encoding'] = 'br';
-            }
             return uploadFile(key, buf, contentType, metadata);
         }),
     );
