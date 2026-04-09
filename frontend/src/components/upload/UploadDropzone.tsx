@@ -15,6 +15,7 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [genre, setGenre] = useState('');
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [errorLocal, setErrorLocal] = useState('');
 
   const onDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -58,7 +59,20 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
       return;
     }
     
-    const success = await startUpload(file, { title, description, genre: normalizedGenre });
+    let bannerBase64: string | undefined = undefined;
+    if (bannerFile) {
+      try {
+        const buffer = await bannerFile.arrayBuffer();
+        // Construct the base64 string
+        const base64Str = btoa(new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), ''));
+        bannerBase64 = `data:${bannerFile.type};base64,${base64Str}`;
+      } catch (err) {
+        setErrorLocal('Failed to read banner image.');
+        return;
+      }
+    }
+    
+    const success = await startUpload(file, { title, description, genre: normalizedGenre, bannerBase64 });
     if (success) {
       onSuccess();
     }
@@ -149,6 +163,28 @@ export function UploadDropzone({ onSuccess }: UploadDropzoneProps) {
             className="w-full bg-[#0d1425] border border-white/10 rounded-xl px-5 py-3.5 text-white font-medium focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all resize-none shadow-inner"
             placeholder="Tell the world what makes your game fun..."
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-400 mb-2 uppercase tracking-wide">Search Banner (Optional 16:9 Landscape)</label>
+          <div className="relative">
+            <input 
+              type="file" 
+              accept="image/jpeg, image/png, image/webp"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  setBannerFile(e.target.files[0]);
+                }
+              }}
+              disabled={isUploading}
+              className="w-full bg-[#0d1425] border border-white/10 rounded-xl px-5 py-3.5 text-white font-medium focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all shadow-inner file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30 cursor-pointer"
+            />
+          </div>
+          {bannerFile && (
+            <p className="text-xs text-primary mt-2 flex items-center gap-1">
+              ✓ Banner selected: {bannerFile.name}
+            </p>
+          )}
         </div>
       </div>
 

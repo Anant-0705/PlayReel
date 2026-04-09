@@ -3,8 +3,8 @@ import { FeedPage } from './pages/FeedPage';
 import { AuthPage } from './pages/AuthPage';
 import { UploadPage } from './pages/UploadPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { SearchPage } from './pages/SearchPage';
 import { BottomNav } from './components/navigation/BottomNav';
-import { Ghost } from 'lucide-react';
 
 export default function App() {
   return (
@@ -16,13 +16,7 @@ export default function App() {
           <Route path="/register" element={<AuthPage />} />
           <Route path="/upload" element={<UploadPage />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/search" element={
-            <div className="flex flex-col h-screen items-center justify-center bg-background text-gray-500 px-6 text-center">
-               <Ghost className="w-16 h-16 mb-4 opacity-20" />
-               <h2 className="text-xl font-bold text-white/50">Search Empty</h2>
-               <p className="mt-2 font-medium">Coming soon...</p>
-            </div>
-          } />
+          <Route path="/search" element={<SearchPage />} />
         </Routes>
         <BottomNav />
       </div>

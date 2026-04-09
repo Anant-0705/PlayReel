@@ -57,11 +57,12 @@ export async function searchGames(params: {
 
     if (q) {
         must.push({
-            multi_match: {
-                query: q,
-                fields: ['title^3', 'description'],
-                fuzziness: 'AUTO',
-            },
+            bool: {
+                should: [
+                    { match: { title: { query: q, fuzziness: 'AUTO', boost: 3 } } },
+                    { match: { description: { query: q, fuzziness: 'AUTO' } } }
+                ]
+            }
         });
     }
 

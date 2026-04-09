@@ -9,6 +9,7 @@ export interface Game {
   thumbnail_url: string;
   manifest_url: string;
   wasm_url: string | null;
+  uploader_id: string;
   uploader_username: string;
   play_count: number;
   like_count: number;

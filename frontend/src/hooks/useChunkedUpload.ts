@@ -12,7 +12,7 @@ export function useChunkedUpload() {
 
   const startUpload = async (
     file: File, 
-    metadata: { title: string, description: string, genre: string }
+    metadata: { title: string, description: string, genre: string, bannerBase64?: string }
   ) => {
     if (!token) return uploadStore.setError('Not authenticated');
     

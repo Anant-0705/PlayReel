@@ -17,7 +17,7 @@ router.get('/', asyncHandler(async (req: Request, res: Response) => {
     if (!q && !genre && !format) {
         // No filters — return newest games from DB (faster than ES)
         const games = await query(
-            `SELECT g.id, g.title, g.genre, g.format, g.thumbnail_url,
+            `SELECT g.id, g.title, g.genre, g.format, g.thumbnail_url, g.manifest_url, g.banner_url,
               g.play_count, g.like_count, g.created_at,
               u.username AS uploader_username
        FROM games g JOIN users u ON u.id = g.uploader_id

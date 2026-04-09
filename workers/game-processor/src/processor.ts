@@ -98,15 +98,34 @@ export async function processGame(msg: ConsumeMessage): Promise<void> {
     // ── 6. DB: set status='ready', store URLs ─────────────────────────────
     const manifestUrl = publicUrl(manifestKey);
     const indexUrl = publicUrl(entryPointPath);
+
+    let bannerUrl: string | null = null;
+    if (metadata.bannerBase64) {
+        try {
+            const match = metadata.bannerBase64.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
+            if (match) {
+                const ext = match[1] === 'jpeg' ? 'jpg' : match[1];
+                const buf = Buffer.from(match[2], 'base64');
+                const bannerKey = `games/${gameId}/banner.${ext}`;
+                await uploadFile(bannerKey, buf, `image/${match[1]}`);
+                bannerUrl = publicUrl(bannerKey);
+                console.log(`[processor] Uploaded custom banner: ${bannerUrl}`);
+            }
+        } catch (e) { 
+            console.error('[processor] Failed to process bannerBase64', e); 
+        }
+    }
+
     await query(
         `UPDATE games
          SET status = 'ready',
              manifest_url = $1,
              wasm_url = $2,
              format = $3,
+             banner_url = $5,
              updated_at = NOW()
          WHERE id = $4`,
-        [manifestUrl, wasmKey ? publicUrl(wasmKey) : null, detectedFormat, gameId],
+        [manifestUrl, wasmKey ? publicUrl(wasmKey) : null, detectedFormat, gameId, bannerUrl],
     );
     console.log(`[processor] DB updated — game is live: ${gameId}`);
 
